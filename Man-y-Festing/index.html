@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="UnityVision - Your Digital Vision Board for Manifesting Dreams">
+    
+    <title>UnityVision - Manifest Your Dreams</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- LOADING SCREEN -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>UnityVision</h2>
+            <p>Loading your dreams...</p>
+        </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="sparkle-icon">✨</div>
+                <h1 class="login-title">UnityVision</h1>
+                <p class="login-subtitle">Manifest Your Dreams</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        placeholder="Enter your name" 
+                        autocomplete="username"
+                        required>
+                </div>
+
+                <div class="input-group">
+                    <label for="accessCode">Access Code</label>
+                    <div class="password-input-wrapper">
+                        <input 
+                            type="password" 
+                            id="accessCode" 
+                            placeholder="Enter access code" 
+                            autocomplete="current-password"
+                            required>
+                        <button type="button" id="togglePassword" class="toggle-password" aria-label="Toggle password visibility">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-button">
+                    ✨ Enter Your Vision
+                </button>
+                
+                <p class="first-time-hint">First time? Default code is <strong>1234</strong></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="appContainer" class="app-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>✨ UnityVision</h2>
+                <span id="userGreeting" class="user-greeting"></span>
+            </div>
+
+            <nav id="categoryNav" class="nav">
+                <button class="nav-button active" data-category="Personal" aria-label="Personal vision board">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">Personal</span>
+                    <span class="nav-count" data-count="Personal">0</span>
+                </button>
+                <button class="nav-button" data-category="Friends" aria-label="Friends vision board">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Friends</span>
+                    <span class="nav-count" data-count="Friends">0</span>
+                </button>
+                <button class="nav-button" data-category="Family" aria-label="Family vision board">
+                    <span class="nav-icon">❤️</span>
+                    <span class="nav-text">Family</span>
+                    <span class="nav-count" data-count="Family">0</span>
+                </button>
+                <button class="nav-button" data-category="Couple" aria-label="Couple vision board">
+                    <span class="nav-icon">💑</span>
+                    <span class="nav-text">Couple</span>
+                    <span class="nav-count" data-count="Couple">0</span>
+                </button>
+
+                <div class="nav-divider"></div>
+
+                <button id="settingsBtn" class="nav-button nav-button-secondary">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Settings</span>
+                </button>
+                <button id="exportBtn" class="nav-button nav-button-secondary">
+                    <span class="nav-icon">📥</span>
+                    <span class="nav-text">Export Data</span>
+                </button>
+                <button id="logoutBtn" class="nav-button nav-button-secondary">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Logout</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+            <div class="header">
+                <div class="header-info">
+                    <h1 id="categoryTitle">Personal Vision Board</h1>
+                    <p id="categorySubtitle">0 visions • 0 manifested ✨</p>
+                </div>
+
+                <div class="header-actions">
+                    <div class="view-toggle">
+                        <button id="gridViewBtn" class="view-btn active" aria-label="Grid view">
+                            <span>▦</span>
+                        </button>
+                        <button id="listViewBtn" class="view-btn" aria-label="List view">
+                            <span>☰</span>
+                        </button>
+                    </div>
+                    <button id="addVisionBtn" class="add-button">
+                        ➕ Add Vision
+                    </button>
+                </div>
+            </div>
+
+            <div id="visionGrid" class="grid"></div>
+        </main>
+    </div>
+
+    <!-- VISION MODAL -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal" role="dialog" aria-labelledby="modalTitle">
+
+            <div class="modal-header">
+                <h2 id="modalTitle">Create Vision</h2>
+                <button id="closeModalBtn" class="close-btn" aria-label="Close modal">×</button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="input-group">
+                    <label for="goalName">Goal Name *</label>
+                    <input 
+                        id="goalName" 
+                        type="text"
+                        placeholder="e.g., Dream house, Fitness goal, Career milestone"
+                        maxlength="50"
+                        required>
+                    <span class="char-count"><span id="goalNameCount">0</span>/50</span>
+                </div>
+
+                <div class="input-group">
+                    <label for="imageUrl">Image URL *</label>
+                    <input 
+                        id="imageUrl" 
+                        type="url"
+                        placeholder="https://example.com/image.jpg"
+                        required>
+                    <small class="input-hint">Paste a link to an inspiring image</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="affirmation">Affirmation *</label>
+                    <textarea 
+                        id="affirmation"
+                        placeholder="Write a powerful affirmation in present tense... (e.g., I am living in my dream home filled with joy and abundance)"
+                        maxlength="200"
+                        rows="4"
+                        required></textarea>
+                    <span class="char-count"><span id="affirmationCount">0</span>/200</span>
+                </div>
+
+                <div class="image-preview-container">
+                    <label>Image Preview</label>
+                    <div id="imagePreview" class="image-preview">
+                        <span class="preview-placeholder">Image will appear here</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancelBtn" class="btn-secondary">Cancel</button>
+                <button id="submitVisionBtn" class="btn-primary" disabled>✨ Create Vision</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsOverlay" class="modal-overlay">
+        <div class="modal" role="dialog" aria-labelledby="settingsTitle">
+
+            <div class="modal-header">
+                <h2 id="settingsTitle">Settings</h2>
+                <button id="closeSettingsBtn" class="close-btn" aria-label="Close settings">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="newUsername">Username</label>
+                    <input 
+                        id="newUsername" 
+                        type="text" 
+                        placeholder="Enter new username"
+                        maxlength="30">
+                </div>
+
+                <div class="input-group">
+                    <label for="newAccessCode">Access Code</label>
+                    <input 
+                        id="newAccessCode" 
+                        type="password" 
+                        placeholder="Enter new access code"
+                        minlength="4">
+                    <small class="input-hint">Minimum 4 characters</small>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Data Management</h3>
+                    <button id="clearAllDataBtn" class="btn-danger">
+                        🗑️ Clear All Visions
+                    </button>
+                    <small class="input-hint warning">This action cannot be undone!</small>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancelSettingsBtn" class="btn-secondary">Cancel</button>
+                <button id="saveSettingsBtn" class="btn-primary">💾 Save Changes</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
