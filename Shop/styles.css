@@ -71,7 +71,7 @@ img { display: block; max-width: 100%; }
 .main-content { padding-top: 44px; padding-bottom: 20px; }
 @media (max-width: 640px) { .main-content { padding-top: 30px; padding-bottom: 12px; } }
 
-/* ---------- Seam divider (signature element) ---------- */
+/* ---------- Seam dgitivider (signature element) ---------- */
 
 .seam { width: 100%; height: 14px; display: block; }
 .seam-line { stroke: var(--brass); stroke-width: 1.6; stroke-dasharray: 7 6; fill: none; opacity: 0.55; }
