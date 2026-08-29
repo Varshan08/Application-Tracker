@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ============ NAVBAR ============ -->
+<header class="navbar">
+  <div class="nav-row container">
+    <button class="nav-logo" id="logoBtn" type="button">
+      <span class="nav-logo-badge" id="logoBadge">A</span>
+      <span class="nav-logo-text">
+        <span class="display nav-store-name" id="navStoreName">Your Store Name</span>
+        <span class="nav-tagline" id="navTagline">Curated clothing &amp; fine jewelry</span>
+      </span>
+    </button>
+
+    <nav class="nav-center" id="navCenter"></nav>
+
+    <div class="nav-actions">
+      <div class="nav-search-wrap">
+        <i data-lucide="search" class="icon-sm"></i>
+        <input type="text" id="searchInput" placeholder="Search pieces..." class="nav-search-input" />
+      </div>
+      <button class="icon-btn" id="cartBtn" type="button" aria-label="Open cart">
+        <i data-lucide="shopping-bag"></i>
+        <span class="cart-badge hidden" id="cartBadge">0</span>
+      </button>
+      <button class="icon-btn" id="adminBtn" type="button" aria-label="Admin">
+        <i data-lucide="lock"></i>
+      </button>
+      <button class="icon-btn nav-mobile-toggle" id="mobileToggle" type="button" aria-label="Menu">
+        <i data-lucide="menu"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="nav-mobile-panel" id="navMobilePanel">
+    <div class="nav-mobile-links" id="navMobileLinks"></div>
+    <div class="nav-search-wrap" style="width:100%">
+      <i data-lucide="search" class="icon-sm"></i>
+      <input type="text" id="searchInputMobile" placeholder="Search pieces..." class="nav-search-input" />
+    </div>
+  </div>
+</header>
+
+<!-- ============ STOREFRONT ============ -->
+<div id="storefrontView">
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow">New season &middot; Made to last</div>
+        <h1 class="display hero-title">Clothing cut with intent.<br>Jewelry made to keep.</h1>
+        <p class="hero-sub" id="heroTagline">Curated clothing &amp; fine jewelry &mdash; every piece chosen for how it wears, not just how it photographs.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" id="shopClothingBtn" type="button">Shop Clothing <i data-lucide="chevron-right" class="icon-sm"></i></button>
+          <button class="btn-secondary" id="shopJewelryBtn" type="button">Shop Jewelry</button>
+        </div>
+      </div>
+      <div class="hero-images">
+        <img class="hero-img offset" src="https://picsum.photos/seed/heroclothing/500/640" alt="Clothing edit" onerror="this.style.background='var(--stone-dim)'; this.src='';" />
+        <img class="hero-img" src="https://picsum.photos/seed/herojewelry/500/640" alt="Jewelry edit" onerror="this.style.background='var(--stone-dim)'; this.src='';" />
+      </div>
+    </div>
+    <svg class="seam" viewBox="0 0 400 14" preserveAspectRatio="none" aria-hidden="true">
+      <line x1="0" y1="7" x2="400" y2="7" class="seam-line" />
+    </svg>
+  </section>
+
+  <main class="container main-content">
+    <div class="controls-row">
+      <div id="pieceCount" class="piece-count"></div>
+      <select id="sortSelect" class="sort-select">
+        <option value="newest">Newest</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+      </select>
+    </div>
+    <div id="productGrid" class="product-grid"></div>
+    <div id="emptyState" class="empty-state hidden">
+      <p class="display" style="font-size:22px;">Nothing here yet</p>
+      <p style="font-size:13.5px; margin-top:8px;">Try a different category or search term.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner container">
+      <div>
+        <div class="display footer-brand" id="footerStoreName">Your Store Name</div>
+        <div class="footer-tagline" id="footerTagline">Curated clothing &amp; fine jewelry</div>
+      </div>
+      <div class="footer-contact" id="footerContact"></div>
+    </div>
+    <div class="footer-bottom">&copy; <span id="footerYear"></span> <span id="footerYearName">Your Store Name</span></div>
+  </footer>
+</div>
+
+<!-- ============ ADMIN VIEW ============ -->
+<div id="adminView" class="hidden">
+  <div class="admin-wrap container">
+    <div class="admin-header">
+      <div>
+        <div class="eyebrow">Admin</div>
+        <h2 class="display" style="font-size:28px;">Store dashboard</h2>
+      </div>
+      <button class="btn-outline" id="adminLogoutBtn" type="button"><i data-lucide="log-out" class="icon-sm"></i> Sign out</button>
+    </div>
+
+    <div class="admin-tabs" id="adminTabs">
+      <button class="admin-tab active" data-tab="products" type="button"><i data-lucide="package" class="icon-sm"></i> Products</button>
+      <button class="admin-tab" data-tab="orders" type="button"><i data-lucide="clipboard-list" class="icon-sm"></i> Orders</button>
+      <button class="admin-tab" data-tab="settings" type="button"><i data-lucide="settings" class="icon-sm"></i> Settings</button>
+    </div>
+
+    <div id="adminContent"></div>
+  </div>
+</div>
+
+<!-- ============ PRODUCT MODAL ============ -->
+<div class="modal-overlay hidden" id="productModalOverlay">
+  <div class="modal-card" id="productModalCard"></div>
+</div>
+
+<!-- ============ CART DRAWER ============ -->
+<div class="cart-overlay hidden" id="cartOverlay">
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+      <h3 class="display" style="font-size:22px;">Your Bag</h3>
+      <button class="icon-btn" id="cartCloseBtn" type="button" aria-label="Close cart"><i data-lucide="x"></i></button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartFooter"></div>
+  </div>
+</div>
+
+<!-- ============ CHECKOUT MODAL ============ -->
+<div class="modal-overlay hidden" id="checkoutOverlay">
+  <div class="checkout-panel" id="checkoutPanel"></div>
+</div>
+
+<!-- ============ ADMIN LOGIN MODAL ============ -->
+<div class="modal-overlay hidden" id="adminLoginOverlay">
+  <div class="admin-login-panel" id="adminLoginPanel"></div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
