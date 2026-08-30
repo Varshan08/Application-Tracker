@@ -2,31 +2,102 @@
    CONSTANTS
    ============================================================ */
 
+const AUDIENCES = ["Kids", "Women"];
 const CATEGORIES = ["Clothing", "Jewelry"];
 
 const DEFAULT_CONFIG = {
-  storeName: "Your Store Name",
-  tagline: "Curated clothing & fine jewelry",
-  whatsapp: "911234567890", // country code + number, digits only
+  storeName: "DK Craze",
+  tagline: "The Trend Store — Kids & Women",
+  whatsapp: "919843441110", // country code + number, digits only
   email: "owner@example.com",
   address: "",
+  instagram: "https://www.instagram.com/reel/DclSrc6pNV8/?igsi=b2R5bzltcXZ0b2M4",
+  wholesaleNote: "Wholesale available — message us on WhatsApp for bulk pricing.",
+  upiId: "", // e.g. "yourname@okaxis" — needed for the GPay/UPI checkout option to appear
   adminPassword: "admin123",
 };
 
+// priceTiers: list of { label, price } — lets a product be sold as "1 Set" / "3 Set" etc.
 const SEED_PRODUCTS = [
-  { id: "p1", name: "Draped Silk Midi Dress", category: "Clothing", subcategory: "Dresses", price: 3499, stock: 8, featured: true, description: "A fluid silk-blend midi with a soft cowl neckline, cut to move. Finished with mother-of-pearl buttons at the cuff.", image: "https://picsum.photos/seed/silkmidi/700/900", createdAt: 8 },
-  { id: "p2", name: "Tailored Linen Blazer", category: "Clothing", subcategory: "Outerwear", price: 4299, stock: 5, featured: true, description: "Structured shoulders, a nipped waist, and breathable linen — built for transitional weather.", image: "https://picsum.photos/seed/linenblazer/700/900", createdAt: 7 },
-  { id: "p3", name: "Pleated Wide-Leg Trousers", category: "Clothing", subcategory: "Trousers", price: 2199, stock: 12, featured: false, description: "High-waisted trousers with knife pleats and a fluid drape that flatters every silhouette.", image: "https://picsum.photos/seed/pleatedtrousers/700/900", createdAt: 6 },
-  { id: "p4", name: "Hand-Embroidered Blouse", category: "Clothing", subcategory: "Tops", price: 1899, stock: 15, featured: false, description: "Cotton voile blouse with hand-embroidered florals along the yoke. Made by artisan partners.", image: "https://picsum.photos/seed/embroideredblouse/700/900", createdAt: 5 },
-  { id: "p5", name: "Antique Gold Chain Necklace", category: "Jewelry", subcategory: "Necklaces", price: 2899, stock: 10, featured: true, description: "A hand-finished brass chain with an antique gold wash — layers beautifully or wears alone.", image: "https://picsum.photos/seed/goldchain/700/900", createdAt: 4 },
-  { id: "p6", name: "Pearl Drop Earrings", category: "Jewelry", subcategory: "Earrings", price: 1299, stock: 20, featured: true, description: "Freshwater pearls suspended from delicate gold-plated hooks. Lightweight enough for all-day wear.", image: "https://picsum.photos/seed/pearldrops/700/900", createdAt: 3 },
-  { id: "p7", name: "Stacking Ring Set (3pc)", category: "Jewelry", subcategory: "Rings", price: 999, stock: 25, featured: false, description: "Three slim bands in mixed textures, designed to be worn together or separately.", image: "https://picsum.photos/seed/stackingrings/700/900", createdAt: 2 },
-  { id: "p8", name: "Beaded Statement Bracelet", category: "Jewelry", subcategory: "Bracelets", price: 1599, stock: 9, featured: false, description: "Hand-strung glass and brass beads on memory wire — no clasp needed.", image: "https://picsum.photos/seed/beadedbracelet/700/900", createdAt: 1 },
+  {
+    id: "p1", name: "Babyhug Brand Surplus Romper Set", brand: "Babyhug", audience: "Kids", category: "Clothing",
+    subcategory: "Rompers", stock: 20, featured: true,
+    description: "Genuine Babyhug brand surplus stock. Soft cotton rompers, perfect for everyday wear. Sold as single pieces or 3-piece sets at a bulk discount.",
+    image: "https://picsum.photos/seed/babyromper/700/900",
+    priceTiers: [{ label: "1 Set", price: 299 }, { label: "3 Set", price: 799 }],
+    wholesaleAvailable: true, createdAt: 8,
+  },
+  {
+    id: "p2", name: "Kids Printed Cotton Frock", brand: "", audience: "Kids", category: "Clothing",
+    subcategory: "Dresses", stock: 14, featured: true,
+    description: "Breathable cotton frock with a playful print — easy to move in, easy to wash.",
+    image: "https://picsum.photos/seed/kidsfrock/700/900",
+    priceTiers: [{ label: "Single Piece", price: 449 }],
+    wholesaleAvailable: false, createdAt: 7,
+  },
+  {
+    id: "p3", name: "Kids Charm Bracelet", brand: "", audience: "Kids", category: "Jewelry",
+    subcategory: "Bracelets", stock: 25, featured: false,
+    description: "Lightweight, nickel-free charm bracelet sized for little wrists.",
+    image: "https://picsum.photos/seed/kidsbracelet/700/900",
+    priceTiers: [{ label: "Single Piece", price: 199 }],
+    wholesaleAvailable: false, createdAt: 6,
+  },
+  {
+    id: "p4", name: "Draped Silk Midi Dress", brand: "", audience: "Women", category: "Clothing",
+    subcategory: "Dresses", stock: 8, featured: true,
+    description: "A fluid silk-blend midi with a soft cowl neckline, cut to move.",
+    image: "https://picsum.photos/seed/silkmidi/700/900",
+    priceTiers: [{ label: "Single Piece", price: 3499 }],
+    wholesaleAvailable: false, createdAt: 5,
+  },
+  {
+    id: "p5", name: "Hand-Embroidered Blouse", brand: "", audience: "Women", category: "Clothing",
+    subcategory: "Tops", stock: 15, featured: false,
+    description: "Cotton voile blouse with hand-embroidered florals along the yoke.",
+    image: "https://picsum.photos/seed/embroideredblouse/700/900",
+    priceTiers: [{ label: "Single Piece", price: 1899 }],
+    wholesaleAvailable: false, createdAt: 4,
+  },
+  {
+    id: "p6", name: "Antique Gold Chain Necklace", brand: "", audience: "Women", category: "Jewelry",
+    subcategory: "Necklaces", stock: 10, featured: true,
+    description: "A hand-finished brass chain with an antique gold wash — layers beautifully or wears alone.",
+    image: "https://picsum.photos/seed/goldchain/700/900",
+    priceTiers: [{ label: "Single Piece", price: 2899 }],
+    wholesaleAvailable: false, createdAt: 3,
+  },
+  {
+    id: "p7", name: "Pearl Drop Earrings", brand: "", audience: "Women", category: "Jewelry",
+    subcategory: "Earrings", stock: 20, featured: true,
+    description: "Freshwater pearls suspended from delicate gold-plated hooks.",
+    image: "https://picsum.photos/seed/pearldrops/700/900",
+    priceTiers: [{ label: "Single Piece", price: 1299 }],
+    wholesaleAvailable: false, createdAt: 2,
+  },
+  {
+    id: "p8", name: "Kids Stacking Ring Set (3pc)", brand: "", audience: "Kids", category: "Jewelry",
+    subcategory: "Rings", stock: 25, featured: false,
+    description: "Three slim adjustable bands sized for kids — no sharp edges, easy to resize.",
+    image: "https://picsum.photos/seed/kidsrings/700/900",
+    priceTiers: [{ label: "1 Set", price: 149 }],
+    wholesaleAvailable: false, createdAt: 1,
+  },
 ];
 
 const fmt = (n) => "\u20B9" + Number(n || 0).toLocaleString("en-IN");
 const uid = () => "id" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function lowestTier(p) {
+  if (!p.priceTiers || p.priceTiers.length === 0) return { label: "Single Piece", price: 0 };
+  return [...p.priceTiers].sort((a, b) => a.price - b.price)[0];
+}
+function priceDisplay(p) {
+  const tiers = p.priceTiers || [];
+  if (tiers.length <= 1) return fmt(lowestTier(p).price);
+  return "From " + fmt(lowestTier(p).price);
+}
 
 /* ============================================================
    STORAGE (localStorage)
@@ -38,7 +109,7 @@ const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&a
 const DB = {
   get(key, fallback) {
     try {
-      const raw = localStorage.getItem("atelier__" + key);
+      const raw = localStorage.getItem("dkcraze__" + key);
       return raw ? JSON.parse(raw) : fallback;
     } catch (e) {
       console.error("Storage read failed", e);
@@ -47,7 +118,7 @@ const DB = {
   },
   set(key, value) {
     try {
-      localStorage.setItem("atelier__" + key, JSON.stringify(value));
+      localStorage.setItem("dkcraze__" + key, JSON.stringify(value));
     } catch (e) {
       console.error("Storage write failed", e);
     }
@@ -62,11 +133,11 @@ const state = {
   products: DB.get("products", null) || SEED_PRODUCTS,
   orders: DB.get("orders", []),
   config: DB.get("storeConfig", null) || DEFAULT_CONFIG,
-  cart: [],
-  category: "All",
+  cart: [], // { lineId, productId, tierLabel, tierPrice, qty }
+  audience: "All", // All | Kids | Women
+  typeFilter: "All", // All | Clothing | Jewelry
   search: "",
   sort: "newest",
-  selectedProductId: null,
   isAdmin: false,
   adminTab: "products",
   editingProductId: null,
@@ -88,15 +159,14 @@ const $ = (id) => document.getElementById(id);
 function icons() { if (window.lucide) lucide.createIcons(); }
 
 /* ============================================================
-   NAVBAR / HERO / FOOTER (config-driven, rendered once + on config change)
+   NAVBAR / HERO / FOOTER (config-driven)
    ============================================================ */
 
 function renderChrome() {
   const c = state.config;
   $("navStoreName").textContent = c.storeName;
   $("navTagline").textContent = c.tagline;
-  $("logoBadge").textContent = (c.storeName?.trim()?.[0] || "A").toUpperCase();
-  $("heroTagline").textContent = `${c.tagline} — every piece chosen for how it wears, not just how it photographs.`;
+  $("heroTagline").textContent = `${c.tagline} — clothing and jewelry picked for how it wears, not just how it photographs.`;
   $("footerStoreName").textContent = c.storeName;
   $("footerTagline").textContent = c.tagline;
   $("footerYearName").textContent = c.storeName;
@@ -107,11 +177,18 @@ function renderChrome() {
   if (c.address) contactBits.push(`<span>${escapeHtml(c.address)}</span>`);
   $("footerContact").innerHTML = contactBits.join("");
 
-  const navLinksHtml = ["All", ...CATEGORIES].map(
-    (cat) => `<button class="nav-link${state.category === cat ? " active" : ""}" data-action="set-category" data-category="${cat}" type="button">${cat}</button>`
+  const wholesaleBits = [];
+  if (c.wholesaleNote) wholesaleBits.push(escapeHtml(c.wholesaleNote));
+  if (c.instagram) wholesaleBits.push(`<a href="${escapeHtml(c.instagram)}" target="_blank" rel="noopener noreferrer">Follow us on Instagram</a>`);
+  $("footerWholesale").innerHTML = wholesaleBits.join(" &middot; ");
+
+  const audienceLinksHtml = ["All", ...AUDIENCES].map(
+    (a) => `<button class="nav-link${state.audience === a ? " active" : ""}" data-action="set-audience" data-audience="${a}" type="button">${a}</button>`
   ).join("");
-  $("navCenter").innerHTML = navLinksHtml;
-  $("navMobileLinks").innerHTML = navLinksHtml;
+  $("navCenter").innerHTML = audienceLinksHtml;
+  $("navMobileLinks").innerHTML = audienceLinksHtml;
+
+  $("typeFilterSelect").value = state.typeFilter;
 }
 
 /* ============================================================
@@ -120,17 +197,19 @@ function renderChrome() {
 
 function getFilteredProducts() {
   let list = [...state.products];
-  if (state.category !== "All") list = list.filter((p) => p.category === state.category);
+  if (state.audience !== "All") list = list.filter((p) => p.audience === state.audience);
+  if (state.typeFilter !== "All") list = list.filter((p) => p.category === state.typeFilter);
   if (state.search.trim()) {
     const q = state.search.toLowerCase();
     list = list.filter((p) =>
       p.name.toLowerCase().includes(q) ||
+      (p.brand || "").toLowerCase().includes(q) ||
       (p.subcategory || "").toLowerCase().includes(q) ||
       (p.description || "").toLowerCase().includes(q)
     );
   }
-  if (state.sort === "price-asc") list.sort((a, b) => a.price - b.price);
-  else if (state.sort === "price-desc") list.sort((a, b) => b.price - a.price);
+  if (state.sort === "price-asc") list.sort((a, b) => lowestTier(a).price - lowestTier(b).price);
+  else if (state.sort === "price-desc") list.sort((a, b) => lowestTier(b).price - lowestTier(a).price);
   else list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   return list;
 }
@@ -147,9 +226,10 @@ function productCardHtml(p) {
           ${out ? `<span class="badge-soldout">Sold Out</span>` : ""}
         </div>
         <div class="product-info">
-          <div class="product-category">${escapeHtml(p.subcategory || p.category)}</div>
+          ${p.brand ? `<div class="product-brand">${escapeHtml(p.brand)}</div>` : ""}
+          <div class="product-category">${escapeHtml(p.audience)} · ${escapeHtml(p.subcategory || p.category)}</div>
           <div class="display product-name">${escapeHtml(p.name)}</div>
-          <div class="product-price">${fmt(p.price)}</div>
+          <div class="product-price">${priceDisplay(p)}</div>
           ${low && !out ? `<div class="product-lowstock">Only ${p.stock} left</div>` : ""}
         </div>
       </button>
@@ -173,20 +253,42 @@ function renderProductGrid() {
    PRODUCT MODAL
    ============================================================ */
 
+function tierOptionsHtml(p, selectedLabel) {
+  const tiers = p.priceTiers || [];
+  if (tiers.length <= 1) return "";
+  return `
+    <div class="tier-section">
+      <div class="tier-label-heading">Choose an option</div>
+      ${tiers.map((t, i) => `
+        <label class="tier-option${t.label === selectedLabel ? " selected" : ""}">
+          <span style="display:flex; align-items:center; gap:8px;">
+            <input type="radio" name="tierChoice" value="${escapeHtml(t.label)}" data-price="${t.price}" ${t.label === selectedLabel ? "checked" : ""} />
+            ${escapeHtml(t.label)}
+          </span>
+          <span class="tier-option-price">${fmt(t.price)}</span>
+        </label>
+      `).join("")}
+    </div>
+  `;
+}
+
 function openProductModal(id) {
-  state.selectedProductId = id;
   const p = state.products.find((x) => x.id === id);
   if (!p) return;
   const out = p.stock <= 0;
+  const defaultTier = lowestTier(p);
   $("productModalCard").innerHTML = `
     <img class="modal-image" src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" onerror="this.style.opacity='0.3'; this.src='';" />
     <div class="modal-panel">
       <button class="modal-close" data-action="close-product-modal" type="button" aria-label="Close"><i data-lucide="x"></i></button>
-      <div class="modal-category">${escapeHtml(p.subcategory || p.category)}</div>
+      ${p.brand ? `<div class="product-brand">${escapeHtml(p.brand)}</div>` : ""}
+      <div class="modal-category">${escapeHtml(p.audience)} · ${escapeHtml(p.subcategory || p.category)}</div>
       <h2 class="display modal-title">${escapeHtml(p.name)}</h2>
-      <div class="modal-price">${fmt(p.price)}</div>
+      <div class="modal-price" id="modalPrice">${fmt(defaultTier.price)}</div>
       <p class="modal-desc">${escapeHtml(p.description || "")}</p>
       <div class="modal-stock">${out ? "Currently sold out" : `${p.stock} in stock`}</div>
+      ${tierOptionsHtml(p, defaultTier.label)}
+      ${p.wholesaleAvailable ? `<div class="wholesale-note"><i data-lucide="badge-percent" class="icon-sm"></i> ${escapeHtml(state.config.wholesaleNote || "Wholesale available — message us for bulk pricing.")}</div>` : ""}
       <button class="btn-modal-add${out ? " disabled" : ""}" data-action="add-to-cart-close" data-id="${p.id}" type="button" ${out ? "disabled" : ""}>
         <span>${out ? "Unavailable" : "Add to Bag"}</span>
       </button>
@@ -194,9 +296,16 @@ function openProductModal(id) {
   `;
   $("productModalOverlay").classList.remove("hidden");
   icons();
+
+  document.querySelectorAll('#productModalCard input[name="tierChoice"]').forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      $("modalPrice").textContent = fmt(Number(e.target.dataset.price));
+      document.querySelectorAll("#productModalCard .tier-option").forEach((el) => el.classList.remove("selected"));
+      e.target.closest(".tier-option").classList.add("selected");
+    });
+  });
 }
 function closeProductModal() {
-  state.selectedProductId = null;
   $("productModalOverlay").classList.add("hidden");
 }
 
@@ -204,26 +313,28 @@ function closeProductModal() {
    CART
    ============================================================ */
 
-function addToCart(id) {
-  const p = state.products.find((x) => x.id === id);
+function addToCart(productId, tierLabel) {
+  const p = state.products.find((x) => x.id === productId);
   if (!p) return;
-  const existing = state.cart.find((c) => c.id === id);
+  const tier = (p.priceTiers || []).find((t) => t.label === tierLabel) || lowestTier(p);
+  const lineId = productId + "::" + tier.label;
+  const existing = state.cart.find((c) => c.lineId === lineId);
   if (existing) existing.qty = Math.min(existing.qty + 1, p.stock);
-  else state.cart.push({ id, qty: 1 });
+  else state.cart.push({ lineId, productId, tierLabel: tier.label, tierPrice: tier.price, qty: 1 });
   openCart();
   renderCart();
 }
 
-function updateQty(id, qty) {
-  if (qty <= 0) { state.cart = state.cart.filter((c) => c.id !== id); renderCart(); return; }
-  const p = state.products.find((x) => x.id === id);
-  const item = state.cart.find((c) => c.id === id);
+function updateQty(lineId, qty) {
+  if (qty <= 0) { state.cart = state.cart.filter((c) => c.lineId !== lineId); renderCart(); return; }
+  const item = state.cart.find((c) => c.lineId === lineId);
+  const p = item ? state.products.find((x) => x.id === item.productId) : null;
   if (item) item.qty = Math.min(qty, p?.stock || qty);
   renderCart();
 }
 
-function removeFromCart(id) {
-  state.cart = state.cart.filter((c) => c.id !== id);
+function removeFromCart(lineId) {
+  state.cart = state.cart.filter((c) => c.lineId !== lineId);
   renderCart();
 }
 
@@ -238,9 +349,9 @@ function renderCartBadge() {
 function renderCart() {
   renderCartBadge();
   const items = state.cart
-    .map((c) => ({ ...c, product: state.products.find((p) => p.id === c.id) }))
+    .map((c) => ({ ...c, product: state.products.find((p) => p.id === c.productId) }))
     .filter((c) => c.product);
-  const total = items.reduce((s, i) => s + i.product.price * i.qty, 0);
+  const total = items.reduce((s, i) => s + i.tierPrice * i.qty, 0);
 
   if (items.length === 0) {
     $("cartItems").innerHTML = `
@@ -255,12 +366,12 @@ function renderCart() {
         <img class="cart-item-img" src="${escapeHtml(i.product.image)}" alt="${escapeHtml(i.product.name)}" onerror="this.style.opacity='0.3'; this.src='';" />
         <div style="flex:1;">
           <div class="cart-item-name">${escapeHtml(i.product.name)}</div>
-          <div class="cart-item-price">${fmt(i.product.price)}</div>
+          <div class="cart-item-price">${escapeHtml(i.tierLabel)} · ${fmt(i.tierPrice)}</div>
           <div class="qty-row">
-            <button class="qty-btn" data-action="qty-dec" data-id="${i.id}" type="button"><i data-lucide="minus"></i></button>
+            <button class="qty-btn" data-action="qty-dec" data-line-id="${i.lineId}" type="button"><i data-lucide="minus"></i></button>
             <span style="font-size:13px; min-width:14px; text-align:center;">${i.qty}</span>
-            <button class="qty-btn" data-action="qty-inc" data-id="${i.id}" type="button"><i data-lucide="plus"></i></button>
-            <button class="cart-remove-btn" data-action="remove-from-cart" data-id="${i.id}" type="button"><i data-lucide="trash-2"></i></button>
+            <button class="qty-btn" data-action="qty-inc" data-line-id="${i.lineId}" type="button"><i data-lucide="plus"></i></button>
+            <button class="cart-remove-btn" data-action="remove-from-cart" data-line-id="${i.lineId}" type="button"><i data-lucide="trash-2"></i></button>
           </div>
         </div>
       </div>
@@ -281,12 +392,16 @@ function closeCart() { $("cartOverlay").classList.remove("open"); }
    ============================================================ */
 
 function buildOrderMessage(order) {
+  const paymentLine = order.payment.method === "GPay / UPI"
+    ? `Payment: GPay / UPI${order.payment.upiRef ? " (Ref: " + order.payment.upiRef + ")" : " (reference not provided)"}`
+    : `Payment: Cash on Delivery`;
   const lines = [
     `New order from ${state.config.storeName}`,
     "",
-    ...order.items.map((i) => `• ${i.name} x${i.qty} — ${fmt(i.price * i.qty)}`),
+    ...order.items.map((i) => `• ${i.name} (${i.tierLabel}) x${i.qty} — ${fmt(i.tierPrice * i.qty)}`),
     "",
     `Total: ${fmt(order.total)}`,
+    paymentLine,
     "",
     `Customer: ${order.customer.name}`,
     `Phone: ${order.customer.phone}`,
@@ -297,12 +412,37 @@ function buildOrderMessage(order) {
   return lines.join("\n");
 }
 
-function openCheckout() {
-  closeCart();
-  const items = state.cart
-    .map((c) => ({ ...c, product: state.products.find((p) => p.id === c.id) }))
-    .filter((c) => c.product);
-  const total = items.reduce((s, i) => s + i.product.price * i.qty, 0);
+function upiUri(orderId, total) {
+  const params = new URLSearchParams({
+    pa: state.config.upiId,
+    pn: state.config.storeName,
+    am: String(total),
+    cu: "INR",
+    tn: `Order ${orderId}`,
+  });
+  return "upi://pay?" + params.toString();
+}
+
+function finalizeOrder(customer, items, total, payment) {
+  const order = {
+    id: payment.orderId || uid(),
+    date: new Date().toISOString(),
+    items: items.map((i) => ({ productId: i.productId, name: i.product.name, tierLabel: i.tierLabel, tierPrice: i.tierPrice, qty: i.qty })),
+    total,
+    customer,
+    payment: { method: payment.method, upiRef: payment.upiRef || "" },
+    status: "new",
+  };
+  state.orders.push(order);
+  saveOrders();
+  state.cart = [];
+  renderCart();
+  showOrderSuccess(order);
+}
+
+function renderCheckoutForm(items, total, prefill) {
+  const hasUpi = !!(state.config.upiId && state.config.upiId.trim());
+  const p = prefill || { name: "", phone: "", address: "", notes: "", paymentMethod: "cod" };
 
   $("checkoutPanel").innerHTML = `
     <div class="checkout-head">
@@ -311,15 +451,39 @@ function openCheckout() {
     </div>
     <form id="checkoutForm">
       <div class="checkout-summary">Total: <strong>${fmt(total)}</strong> · ${items.length} item${items.length !== 1 ? "s" : ""}</div>
-      <label class="field"><span class="field-label">Full name *</span><input name="name" required /></label>
-      <label class="field"><span class="field-label">Phone number *</span><input name="phone" type="tel" required /></label>
-      <label class="field"><span class="field-label">Delivery address *</span><textarea name="address" rows="2" required></textarea></label>
-      <label class="field"><span class="field-label">Notes (optional)</span><textarea name="notes" rows="2"></textarea></label>
-      <button type="submit" class="btn-submit" style="margin-top:8px;">Place Order</button>
+      <label class="field"><span class="field-label">Full name *</span><input name="name" value="${escapeHtml(p.name)}" required /></label>
+      <label class="field"><span class="field-label">Phone number *</span><input name="phone" type="tel" value="${escapeHtml(p.phone)}" required /></label>
+      <label class="field"><span class="field-label">Delivery address *</span><textarea name="address" rows="2" required>${escapeHtml(p.address)}</textarea></label>
+      <label class="field"><span class="field-label">Notes (optional)</span><textarea name="notes" rows="2">${escapeHtml(p.notes)}</textarea></label>
+
+      <div class="field-label" style="margin-bottom:8px;">Payment method *</div>
+      <div class="payment-method-group">
+        <label class="payment-option${p.paymentMethod === "cod" ? " selected" : ""}">
+          <span style="display:flex; align-items:center; gap:8px;">
+            <input type="radio" name="paymentMethod" value="cod" ${p.paymentMethod === "cod" ? "checked" : ""} />
+            Cash on Delivery
+          </span>
+        </label>
+        <label class="payment-option${p.paymentMethod === "gpay" ? " selected" : ""}${hasUpi ? "" : " disabled"}">
+          <span style="display:flex; align-items:center; gap:8px;">
+            <input type="radio" name="paymentMethod" value="gpay" ${p.paymentMethod === "gpay" ? "checked" : ""} ${hasUpi ? "" : "disabled"} />
+            Pay via GPay / UPI
+          </span>
+        </label>
+      </div>
+      ${hasUpi ? "" : `<p class="upi-note">GPay/UPI isn't set up yet — the store admin needs to add a UPI ID in Settings first.</p>`}
+
+      <button type="submit" class="btn-submit" style="margin-top:14px;">Continue</button>
     </form>
   `;
-  $("checkoutOverlay").classList.remove("hidden");
   icons();
+
+  document.querySelectorAll('#checkoutPanel .payment-option:not(.disabled)').forEach((label) => {
+    label.addEventListener("click", () => {
+      document.querySelectorAll('#checkoutPanel .payment-option').forEach((el) => el.classList.remove("selected"));
+      label.classList.add("selected");
+    });
+  });
 
   $("checkoutForm").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -330,34 +494,78 @@ function openCheckout() {
       address: fd.get("address").trim(),
       notes: fd.get("notes").trim(),
     };
+    const paymentMethod = fd.get("paymentMethod") || "cod";
     if (!customer.name || !customer.phone || !customer.address) return;
 
-    const order = {
-      id: uid(),
-      date: new Date().toISOString(),
-      items: items.map((i) => ({ id: i.id, name: i.product.name, price: i.product.price, qty: i.qty })),
-      total,
-      customer,
-      status: "new",
-    };
-    state.orders.push(order);
-    saveOrders();
-    state.cart = [];
-    renderCart();
-    showOrderSuccess(order);
+    if (paymentMethod === "gpay" && hasUpi) {
+      renderGpayStep(customer, items, total);
+    } else {
+      finalizeOrder(customer, items, total, { method: "Cash on Delivery" });
+    }
   });
+}
+
+function renderGpayStep(customer, items, total) {
+  const orderId = uid();
+  const uri = upiUri(orderId, total);
+  const qrSrc = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(uri);
+
+  $("checkoutPanel").innerHTML = `
+    <div class="checkout-head">
+      <h3 class="display" style="font-size:24px;">Pay with GPay / UPI</h3>
+      <button class="modal-close" data-action="close-checkout" type="button"><i data-lucide="x"></i></button>
+    </div>
+    <div class="checkout-summary">Amount to pay: <strong>${fmt(total)}</strong></div>
+    <a class="btn-gpay-pay" href="${uri}"><i data-lucide="smartphone"></i> Open GPay / UPI app</a>
+    <p class="upi-note" style="text-align:center;">On a phone, the button above opens your UPI app directly. On a computer, scan this QR code with your phone's GPay instead:</p>
+    <div class="qr-wrap"><img src="${qrSrc}" alt="UPI payment QR code" width="180" height="180" /></div>
+    <form id="gpayConfirmForm" style="margin-top:16px;">
+      <label class="field"><span class="field-label">UPI transaction / reference ID (optional, but helps the seller confirm faster)</span><input name="upiRef" placeholder="e.g. 123456789012" /></label>
+      <button type="submit" class="btn-submit">I've completed the payment — Place Order</button>
+    </form>
+    <p class="order-note">Note: this site can't automatically verify UPI payments on its own — it simply hands off to your GPay app. ${escapeHtml(state.config.storeName)} will confirm the payment landed before shipping.</p>
+    <button class="btn-continue" type="button" data-action="back-to-checkout-form">← Back</button>
+  `;
+  icons();
+
+  $("gpayConfirmForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    finalizeOrder(customer, items, total, {
+      method: "GPay / UPI",
+      upiRef: fd.get("upiRef").trim(),
+      orderId,
+    });
+  });
+
+  $("checkoutPanel").querySelector('[data-action="back-to-checkout-form"]').addEventListener("click", () => {
+    renderCheckoutForm(items, total, { ...customer, paymentMethod: "gpay" });
+  });
+}
+
+function openCheckout() {
+  closeCart();
+  const items = state.cart
+    .map((c) => ({ ...c, product: state.products.find((p) => p.id === c.productId) }))
+    .filter((c) => c.product);
+  const total = items.reduce((s, i) => s + i.tierPrice * i.qty, 0);
+  $("checkoutOverlay").classList.remove("hidden");
+  renderCheckoutForm(items, total, null);
 }
 
 function showOrderSuccess(order) {
   const waLink = `https://wa.me/${state.config.whatsapp}?text=${encodeURIComponent(buildOrderMessage(order))}`;
   const mailLink = `mailto:${state.config.email}?subject=${encodeURIComponent("New order — " + state.config.storeName)}&body=${encodeURIComponent(buildOrderMessage(order))}`;
+  const paymentSummary = order.payment.method === "GPay / UPI"
+    ? `Paid via GPay/UPI${order.payment.upiRef ? " · Ref " + escapeHtml(order.payment.upiRef) : ""}`
+    : "Cash on Delivery";
 
   $("checkoutPanel").innerHTML = `
     <div class="checkout-head">
       <h3 class="display" style="font-size:24px;">Order received</h3>
       <button class="modal-close" data-action="close-checkout" type="button"><i data-lucide="x"></i></button>
     </div>
-    <div class="success-banner"><i data-lucide="check" style="color:var(--forest);"></i> Order saved. Now send it to ${escapeHtml(state.config.storeName)}:</div>
+    <div class="success-banner"><i data-lucide="check" style="color:var(--forest);"></i> Order saved (${paymentSummary}). Now send it to ${escapeHtml(state.config.storeName)}:</div>
     <div class="send-options">
       <a class="btn-whatsapp" href="${waLink}" target="_blank" rel="noopener noreferrer"><i data-lucide="phone"></i> Send via WhatsApp</a>
       <a class="btn-email" href="${mailLink}"><i data-lucide="mail"></i> Send via Email</a>
@@ -432,23 +640,48 @@ function renderAdminContent() {
   else renderAdminSettings();
 }
 
+// Tiers are entered as one line per tier: "Label, Price" e.g. "1 Set, 299"
+function tiersToText(tiers) {
+  return (tiers || []).map((t) => `${t.label}, ${t.price}`).join("\n");
+}
+function textToTiers(text) {
+  return text.split("\n").map((line) => line.trim()).filter(Boolean).map((line) => {
+    const idx = line.lastIndexOf(",");
+    if (idx === -1) return null;
+    const label = line.slice(0, idx).trim();
+    const price = Number(line.slice(idx + 1).trim());
+    if (!label || Number.isNaN(price)) return null;
+    return { label, price };
+  }).filter(Boolean);
+}
+
 function productFormHtml(product) {
-  const f = product || { name: "", category: "Clothing", subcategory: "", price: "", stock: "", description: "", image: "", featured: false };
+  const f = product || { name: "", brand: "", audience: "Kids", category: "Clothing", subcategory: "", stock: "", description: "", image: "", priceTiers: [], wholesaleAvailable: false };
   return `
     <form id="productForm" class="form-grid">
       <label class="field"><span class="field-label">Product name *</span><input name="name" value="${escapeHtml(f.name)}" required /></label>
+      <label class="field"><span class="field-label">Brand (optional)</span><input name="brand" value="${escapeHtml(f.brand || "")}" placeholder="e.g. Babyhug" /></label>
       <label class="field">
-        <span class="field-label">Category</span>
+        <span class="field-label">Audience</span>
+        <select name="audience">
+          ${AUDIENCES.map((a) => `<option value="${a}" ${f.audience === a ? "selected" : ""}>${a}</option>`).join("")}
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Type</span>
         <select name="category">
           ${CATEGORIES.map((c) => `<option value="${c}" ${f.category === c ? "selected" : ""}>${c}</option>`).join("")}
         </select>
       </label>
       <label class="field"><span class="field-label">Subcategory (e.g. Dresses, Rings)</span><input name="subcategory" value="${escapeHtml(f.subcategory)}" /></label>
-      <label class="field"><span class="field-label">Price (INR) *</span><input name="price" type="number" min="0" step="1" value="${f.price}" required /></label>
       <label class="field"><span class="field-label">Stock quantity</span><input name="stock" type="number" min="0" step="1" value="${f.stock}" /></label>
-      <label class="field"><span class="field-label">Image URL</span><input name="image" value="${escapeHtml(f.image)}" /></label>
+      <label class="field span-2">
+        <span class="field-label">Pricing (one per line: Label, Price) *</span>
+        <textarea name="priceTiers" rows="3" placeholder="1 Set, 299&#10;3 Set, 799" required>${escapeHtml(tiersToText(f.priceTiers))}</textarea>
+      </label>
+      <label class="field span-2"><span class="field-label">Image URL</span><input name="image" value="${escapeHtml(f.image)}" /></label>
       <label class="field span-2"><span class="field-label">Description</span><textarea name="description" rows="2">${escapeHtml(f.description)}</textarea></label>
-      <label class="checkbox-field"><input type="checkbox" name="featured" ${f.featured ? "checked" : ""} /> Featured item</label>
+      <label class="checkbox-field span-2"><input type="checkbox" name="wholesaleAvailable" ${f.wholesaleAvailable ? "checked" : ""} /> Wholesale available for this item</label>
       <div class="form-actions">
         <button type="submit" class="btn-save">Save</button>
         <button type="button" class="btn-cancel" data-action="cancel-product-form">Cancel</button>
@@ -476,8 +709,8 @@ function renderAdminProducts() {
       <div class="admin-row">
         <img class="admin-row-thumb" src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" onerror="this.style.opacity='0.3'; this.src='';" />
         <div style="flex:1; min-width:0;">
-          <div class="admin-row-name">${escapeHtml(p.name)}</div>
-          <div class="admin-row-meta">${escapeHtml(p.category)}${p.subcategory ? " · " + escapeHtml(p.subcategory) : ""} · ${fmt(p.price)} · stock ${p.stock}</div>
+          <div class="admin-row-name">${p.brand ? escapeHtml(p.brand) + " — " : ""}${escapeHtml(p.name)}</div>
+          <div class="admin-row-meta">${escapeHtml(p.audience)} · ${escapeHtml(p.category)}${p.subcategory ? " · " + escapeHtml(p.subcategory) : ""} · ${priceDisplay(p)} · stock ${p.stock}${p.wholesaleAvailable ? " · wholesale" : ""}</div>
         </div>
         <button class="icon-btn-sm" data-action="edit-product" data-id="${p.id}" type="button"><i data-lucide="edit-2"></i></button>
         <button class="icon-btn-sm" data-action="delete-product" data-id="${p.id}" type="button"><i data-lucide="trash-2"></i></button>
@@ -494,19 +727,27 @@ function renderAdminProducts() {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const fd = new FormData(form);
+      const priceTiers = textToTiers(fd.get("priceTiers") || "");
+      if (priceTiers.length === 0) {
+        alert("Please add at least one valid pricing line, e.g.\n1 Set, 299");
+        return;
+      }
       const p = {
         id: editing ? editing.id : uid(),
         name: fd.get("name").trim(),
+        brand: fd.get("brand").trim(),
+        audience: fd.get("audience"),
         category: fd.get("category"),
         subcategory: fd.get("subcategory").trim(),
-        price: Number(fd.get("price")) || 0,
         stock: Number(fd.get("stock")) || 0,
         description: fd.get("description").trim(),
         image: fd.get("image").trim(),
-        featured: fd.get("featured") === "on",
+        priceTiers,
+        wholesaleAvailable: fd.get("wholesaleAvailable") === "on",
+        featured: editing ? editing.featured : false,
         createdAt: editing ? editing.createdAt : Date.now(),
       };
-      if (!p.name || !p.price) return;
+      if (!p.name) return;
       if (editing) {
         state.products = state.products.map((x) => (x.id === p.id ? p : x));
       } else {
@@ -525,16 +766,23 @@ function renderAdminOrders() {
     $("adminContent").innerHTML = `<p style="opacity:0.6; font-size:13.5px;">No orders yet. Orders placed on the site will appear here as a backup log — they're also sent to you directly via WhatsApp/email by the customer.</p>`;
     return;
   }
-  $("adminContent").innerHTML = [...state.orders].reverse().map((o) => `
+  $("adminContent").innerHTML = [...state.orders].reverse().map((o) => {
+    const payment = o.payment || { method: "Cash on Delivery" };
+    const paymentLabel = payment.method === "GPay / UPI"
+      ? `GPay/UPI${payment.upiRef ? " · Ref " + escapeHtml(payment.upiRef) : " · no ref given"}`
+      : "Cash on Delivery";
+    return `
     <div class="order-card">
       <div class="order-top"><span>${new Date(o.date).toLocaleString("en-IN")}</span><span>${fmt(o.total)}</span></div>
       <div class="order-customer">${escapeHtml(o.customer.name)} · ${escapeHtml(o.customer.phone)}</div>
       <div class="order-address">${escapeHtml(o.customer.address)}</div>
+      <div class="order-payment">${paymentLabel}</div>
       <div class="order-items">
-        ${o.items.map((i) => `<div>${escapeHtml(i.name)} × ${i.qty} — ${fmt(i.price * i.qty)}</div>`).join("")}
+        ${o.items.map((i) => `<div>${escapeHtml(i.name)} (${escapeHtml(i.tierLabel)}) × ${i.qty} — ${fmt(i.tierPrice * i.qty)}</div>`).join("")}
       </div>
     </div>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function renderAdminSettings() {
@@ -545,7 +793,10 @@ function renderAdminSettings() {
       <label class="field"><span class="field-label">Tagline</span><input name="tagline" value="${escapeHtml(c.tagline)}" /></label>
       <label class="field"><span class="field-label">WhatsApp number (country code, digits only) *</span><input name="whatsapp" value="${escapeHtml(c.whatsapp)}" required /></label>
       <label class="field"><span class="field-label">Order email address *</span><input name="email" type="email" value="${escapeHtml(c.email)}" required /></label>
+      <label class="field"><span class="field-label">Instagram link</span><input name="instagram" value="${escapeHtml(c.instagram || "")}" placeholder="https://instagram.com/yourstore" /></label>
+      <label class="field"><span class="field-label">UPI ID (for GPay checkout)</span><input name="upiId" value="${escapeHtml(c.upiId || "")}" placeholder="yourname@okaxis" /></label>
       <label class="field span-2"><span class="field-label">New admin password</span><input name="adminPassword" type="password" value="${escapeHtml(c.adminPassword)}" /></label>
+      <label class="field span-2"><span class="field-label">Wholesale note (shown on wholesale items &amp; footer)</span><textarea name="wholesaleNote" rows="2">${escapeHtml(c.wholesaleNote || "")}</textarea></label>
       <div class="settings-actions">
         <button type="submit" class="btn-save">Save settings</button>
         <span class="saved-msg hidden" id="settingsSavedMsg">Settings saved.</span>
@@ -561,6 +812,9 @@ function renderAdminSettings() {
       whatsapp: fd.get("whatsapp").trim(),
       email: fd.get("email").trim(),
       address: c.address || "",
+      instagram: fd.get("instagram").trim(),
+      wholesaleNote: fd.get("wholesaleNote").trim(),
+      upiId: fd.get("upiId").trim(),
       adminPassword: fd.get("adminPassword").trim() || DEFAULT_CONFIG.adminPassword,
     };
     saveConfig();
@@ -580,10 +834,11 @@ document.addEventListener("click", (e) => {
   if (!el) return;
   const action = el.dataset.action;
   const id = el.dataset.id;
+  const lineId = el.dataset.lineId;
 
   switch (action) {
-    case "set-category":
-      state.category = el.dataset.category;
+    case "set-audience":
+      state.audience = el.dataset.audience;
       renderChrome();
       renderProductGrid();
       $("navMobilePanel").classList.remove("open");
@@ -591,18 +846,23 @@ document.addEventListener("click", (e) => {
     case "open-product": openProductModal(id); break;
     case "close-product-modal": closeProductModal(); break;
     case "add-to-cart": addToCart(id); break;
-    case "add-to-cart-close": addToCart(id); closeProductModal(); break;
+    case "add-to-cart-close": {
+      const checked = document.querySelector('#productModalCard input[name="tierChoice"]:checked');
+      addToCart(id, checked ? checked.value : undefined);
+      closeProductModal();
+      break;
+    }
     case "qty-inc": {
-      const item = state.cart.find((c) => c.id === id);
-      updateQty(id, (item?.qty || 0) + 1);
+      const item = state.cart.find((c) => c.lineId === lineId);
+      updateQty(lineId, (item?.qty || 0) + 1);
       break;
     }
     case "qty-dec": {
-      const item = state.cart.find((c) => c.id === id);
-      updateQty(id, (item?.qty || 0) - 1);
+      const item = state.cart.find((c) => c.lineId === lineId);
+      updateQty(lineId, (item?.qty || 0) - 1);
       break;
     }
-    case "remove-from-cart": removeFromCart(id); break;
+    case "remove-from-cart": removeFromCart(lineId); break;
     case "open-checkout": openCheckout(); break;
     case "close-checkout": closeCheckout(); break;
     case "start-add-product":
@@ -629,7 +889,8 @@ document.addEventListener("click", (e) => {
 });
 
 $("logoBtn").addEventListener("click", () => {
-  state.category = "All";
+  state.audience = "All";
+  state.typeFilter = "All";
   state.search = "";
   $("searchInput").value = "";
   $("searchInputMobile").value = "";
@@ -638,13 +899,13 @@ $("logoBtn").addEventListener("click", () => {
   renderProductGrid();
 });
 
-$("shopClothingBtn").addEventListener("click", () => {
-  state.category = "Clothing";
+$("shopKidsBtn").addEventListener("click", () => {
+  state.audience = "Kids";
   renderChrome();
   renderProductGrid();
 });
-$("shopJewelryBtn").addEventListener("click", () => {
-  state.category = "Jewelry";
+$("shopWomenBtn").addEventListener("click", () => {
+  state.audience = "Women";
   renderChrome();
   renderProductGrid();
 });
@@ -662,6 +923,10 @@ $("searchInputMobile").addEventListener("input", (e) => {
 
 $("sortSelect").addEventListener("change", (e) => {
   state.sort = e.target.value;
+  renderProductGrid();
+});
+$("typeFilterSelect").addEventListener("change", (e) => {
+  state.typeFilter = e.target.value;
   renderProductGrid();
 });
 
@@ -699,7 +964,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 /* ============================================================
-   ADD A CART SCRIM ELEMENT (overlay needs a click-catcher behind the drawer)
+   ADD A CART SCRIM ELEMENT (click-catcher behind the drawer)
    ============================================================ */
 
 (function addCartScrim() {

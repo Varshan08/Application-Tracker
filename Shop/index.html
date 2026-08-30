@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Store</title>
+<title>DK Craze — The Trend Store</title>
+<link rel="icon" href="assets/logo.jpg" type="image/jpeg" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -14,7 +15,7 @@
 <header class="navbar">
   <div class="nav-row container">
     <button class="nav-logo" id="logoBtn" type="button">
-      <span class="nav-logo-badge" id="logoBadge">A</span>
+      <img class="nav-logo-img" id="logoImg" src="assets/logo.jpg" alt="Store logo" />
       <span class="nav-logo-text">
         <span class="display nav-store-name" id="navStoreName">Your Store Name</span>
         <span class="nav-tagline" id="navTagline">Curated clothing &amp; fine jewelry</span>
@@ -55,12 +56,12 @@
   <section class="hero">
     <div class="hero-inner">
       <div>
-        <div class="eyebrow">New season &middot; Made to last</div>
-        <h1 class="display hero-title">Clothing cut with intent.<br>Jewelry made to keep.</h1>
-        <p class="hero-sub" id="heroTagline">Curated clothing &amp; fine jewelry &mdash; every piece chosen for how it wears, not just how it photographs.</p>
+        <div class="eyebrow">New arrivals &middot; Kids &amp; Women</div>
+        <h1 class="display hero-title">Little ones in style.<br>Women who never miss a trend.</h1>
+        <p class="hero-sub" id="heroTagline">The Trend Store for Kids &amp; Women — clothing and jewelry picked for how it wears, not just how it photographs.</p>
         <div class="hero-actions">
-          <button class="btn-primary" id="shopClothingBtn" type="button">Shop Clothing <i data-lucide="chevron-right" class="icon-sm"></i></button>
-          <button class="btn-secondary" id="shopJewelryBtn" type="button">Shop Jewelry</button>
+          <button class="btn-primary" id="shopKidsBtn" type="button">Shop Kids <i data-lucide="chevron-right" class="icon-sm"></i></button>
+          <button class="btn-secondary" id="shopWomenBtn" type="button">Shop Women</button>
         </div>
       </div>
       <div class="hero-images">
@@ -76,11 +77,18 @@
   <main class="container main-content">
     <div class="controls-row">
       <div id="pieceCount" class="piece-count"></div>
-      <select id="sortSelect" class="sort-select">
-        <option value="newest">Newest</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-      </select>
+      <div class="controls-right">
+        <select id="typeFilterSelect" class="sort-select">
+          <option value="All">All Types</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Jewelry">Jewelry</option>
+        </select>
+        <select id="sortSelect" class="sort-select">
+          <option value="newest">Newest</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+        </select>
+      </div>
     </div>
     <div id="productGrid" class="product-grid"></div>
     <div id="emptyState" class="empty-state hidden">
@@ -97,6 +105,7 @@
       </div>
       <div class="footer-contact" id="footerContact"></div>
     </div>
+    <div class="footer-wholesale" id="footerWholesale"></div>
     <div class="footer-bottom">&copy; <span id="footerYear"></span> <span id="footerYearName">Your Store Name</span></div>
   </footer>
 </div>
@@ -128,7 +137,7 @@
 </div>
 
 <!-- ============ CART DRAWER ============ -->
-<div class="cart-overlay hidden" id="cartOverlay">
+<div class="cart-overlay" id="cartOverlay">
   <div class="cart-drawer" id="cartDrawer">
     <div class="cart-header">
       <h3 class="display" style="font-size:22px;">Your Bag</h3>
