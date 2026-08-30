@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
   instagram: "https://www.instagram.com/reel/DclSrc6pNV8/?igsi=b2R5bzltcXZ0b2M4",
   youtube: "https://www.youtube.com/@DkCraze19",
   wholesaleNote: "Wholesale available — message us on WhatsApp for bulk pricing.",
-  upiId: "919843441110@upi",
+  upiId: "hemabharathik@oksbi", // Updated to your Official Google Pay UPI ID
   adminPassword: "admin123",
 };
 
@@ -373,8 +373,24 @@ function openCart() { $("cartOverlay").classList.add("open"); }
 function closeCart() { $("cartOverlay").classList.remove("open"); }
 
 /* ============================================================
-   CHECKOUT
+   CHECKOUT (Dynamic QR Scanner Bound to Admin UPI ID)
    ============================================================ */
+
+function getActiveUpiId() {
+  return (state.config.upiId || DEFAULT_CONFIG.upiId).trim();
+}
+
+function upiUri(orderId, total) {
+  const upi = getActiveUpiId();
+  const params = new URLSearchParams({
+    pa: upi,
+    pn: "Hemalatha Bharathi",
+    am: String(total),
+    cu: "INR",
+    tn: `DK Craze Order ${orderId}`,
+  });
+  return "upi://pay?" + params.toString();
+}
 
 function buildOrderMessage(order) {
   const lines = [
@@ -385,7 +401,7 @@ function buildOrderMessage(order) {
     ...order.items.map((i) => `• ${i.name} x${i.qty} — ${fmt(i.tierPrice * i.qty)}`),
     "",
     `*Total Paid:* ${fmt(order.total)} via GPay / UPI`,
-    `*GPay Target:* ${state.config.whatsapp}`,
+    `*Payment Sent To UPI ID:* ${getActiveUpiId()}`,
     `*UPI Ref ID:* ${order.payment.upiRef || "Not provided"}`,
     `*Payment Screenshot:* ${order.payment.screenshot ? "Attached / Stored" : "Not attached"}`,
     "",
@@ -398,18 +414,6 @@ function buildOrderMessage(order) {
   return lines.join("\n");
 }
 
-function upiUri(orderId, total) {
-  const upi = (state.config.upiId || `${state.config.whatsapp}@upi`).trim();
-  const params = new URLSearchParams({
-    pa: upi,
-    pn: state.config.storeName,
-    am: String(total),
-    cu: "INR",
-    tn: `DK Craze Order ${orderId}`,
-  });
-  return "upi://pay?" + params.toString();
-}
-
 function finalizeOrder(customer, items, total, payment) {
   const order = {
     id: payment.orderId || uid(),
@@ -419,6 +423,7 @@ function finalizeOrder(customer, items, total, payment) {
     customer,
     payment: {
       method: "GPay / UPI",
+      upiId: getActiveUpiId(),
       upiRef: payment.upiRef || "",
       screenshot: state.uploadedScreenshotData || "",
     },
@@ -433,6 +438,7 @@ function finalizeOrder(customer, items, total, payment) {
 
 function renderCheckoutForm(items, total, prefill) {
   const p = prefill || { name: "", phone: "", address: "", notes: "" };
+  const currentUpi = getActiveUpiId();
 
   $("checkoutPanel").innerHTML = `
     <div class="checkout-head">
@@ -448,10 +454,10 @@ function renderCheckoutForm(items, total, prefill) {
 
       <div class="payment-method-badge">
         <i data-lucide="shield-check" style="color:var(--gold);"></i>
-        <span>Prepaid GPay / UPI direct to <strong>${escapeHtml(state.config.whatsapp)}</strong></span>
+        <span>Prepaid UPI / GPay direct to <strong>${escapeHtml(currentUpi)}</strong></span>
       </div>
 
-      <button type="submit" class="btn-submit" style="margin-top:16px;">Proceed to GPay / UPI Scanner</button>
+      <button type="submit" class="btn-submit" style="margin-top:16px;">Proceed to UPI / QR Scanner</button>
     </form>
   `;
   icons();
@@ -473,24 +479,28 @@ function renderCheckoutForm(items, total, prefill) {
 function renderGpayStep(customer, items, total) {
   const orderId = uid();
   const uri = upiUri(orderId, total);
-  const qrSrc = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(uri);
+  const currentUpi = getActiveUpiId();
+  const dynamicQr = "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=" + encodeURIComponent(uri);
 
   $("checkoutPanel").innerHTML = `
     <div class="checkout-head">
-      <h3 class="display" style="font-size:24px;">Scan &amp; Pay via GPay / UPI</h3>
+      <h3 class="display" style="font-size:24px;">Scan &amp; Pay via UPI</h3>
       <button class="modal-close" data-action="close-checkout" type="button"><i data-lucide="x"></i></button>
     </div>
     <div class="checkout-summary">Total payable: <strong style="color:var(--gold-dark);">${fmt(total)}</strong></div>
     
     <div class="gpay-number-box">
-      <span>GPay / PhonePe Mobile:</span>
-      <strong>+91 ${escapeHtml(state.config.whatsapp)}</strong>
+      <span>Payee Name:</span>
+      <strong>Hemalatha Bharathi</strong>
+      <span style="font-size:12px; margin-top:2px; color:var(--blue-dark); font-weight:600;">UPI ID: ${escapeHtml(currentUpi)}</span>
     </div>
 
-    <a class="btn-gpay-pay" href="${uri}"><i data-lucide="smartphone"></i> Click to Open GPay / PhonePe</a>
-    <p class="upi-note" style="text-align:center;">Or scan the QR code using Google Pay, PhonePe, or Paytm:</p>
+    <a class="btn-gpay-pay" href="${uri}"><i data-lucide="smartphone"></i> Open UPI App (GPay / PhonePe / Paytm)</a>
+    <p class="upi-note" style="text-align:center;">Scan this Google Pay QR code to pay directly to <strong>${escapeHtml(currentUpi)}</strong>:</p>
     
-    <div class="qr-wrap"><img src="${qrSrc}" alt="UPI payment QR code" width="170" height="170" /></div>
+    <div class="qr-wrap">
+      <img src="gpay-qr.jpg" alt="Google Pay QR Code" width="220" style="border-radius:12px; border:1px solid var(--line-gold);" onerror="this.src='${dynamicQr}';" />
+    </div>
     
     <form id="gpayConfirmForm" style="margin-top:16px;">
       <label class="field">
@@ -499,7 +509,7 @@ function renderGpayStep(customer, items, total) {
       </label>
       <div id="ssPreviewWrap" class="ss-preview hidden">
         <img id="ssPreviewImg" src="" alt="Screenshot preview" />
-        <span style="font-size:12px; color:var(--gold-dark);">Screenshot uploaded successfully</span>
+        <span style="font-size:12px; color:var(--gold-dark);">Screenshot attached successfully</span>
       </div>
 
       <label class="field" style="margin-top:10px;">
@@ -580,7 +590,7 @@ function showOrderSuccess(order) {
 function closeCheckout() { $("checkoutOverlay").classList.add("hidden"); }
 
 /* ============================================================
-   ADMIN VIEWS & PASSWORD LOGIC (Strict Authentication)
+   ADMIN VIEWS & LOGIC (Strict Authentication)
    ============================================================ */
 
 function openAdminLogin() {
@@ -602,7 +612,6 @@ function openAdminLogin() {
     const fd = new FormData(e.target);
     const enteredPassword = fd.get("password");
 
-    // Strictly check against the current active saved password in config
     if (enteredPassword === state.config.adminPassword) {
       closeAdminLogin();
       enterAdmin();
@@ -807,7 +816,7 @@ function exportOrdersToCSV() {
     alert("No orders available to export.");
     return;
   }
-  const headers = ["Order ID", "Date", "Customer Name", "Phone", "Address", "Items Summary", "Total (INR)", "Payment Method", "UPI Ref"];
+  const headers = ["Order ID", "Date", "Customer Name", "Phone", "Address", "Items Summary", "Total (INR)", "Payment Method", "Target UPI ID", "UPI Ref"];
   const rows = state.orders.map(o => {
     const itemsStr = o.items.map(i => `${i.name} x${i.qty}`).join(" | ");
     return [
@@ -819,6 +828,7 @@ function exportOrdersToCSV() {
       `"${itemsStr.replace(/"/g, '""')}"`,
       `"${o.total}"`,
       `"${o.payment?.method || 'GPay / UPI'}"`,
+      `"${o.payment?.upiId || getActiveUpiId()}"`,
       `"${(o.payment?.upiRef || '').replace(/"/g, '""')}"`
     ].join(",");
   });
@@ -893,7 +903,7 @@ function renderAdminOrders() {
         </div>
         <div class="order-customer">${escapeHtml(o.customer.name)} · 📞 ${escapeHtml(o.customer.phone)}</div>
         <div class="order-address">📍 ${escapeHtml(o.customer.address)}</div>
-        <div class="order-payment">Paid via GPay / UPI ${o.payment?.upiRef ? " · Ref: " + escapeHtml(o.payment.upiRef) : ""}</div>
+        <div class="order-payment">Paid via GPay / UPI ${o.payment?.upiRef ? " · Ref: " + escapeHtml(o.payment.upiRef) : ""} (Sent to: ${escapeHtml(o.payment?.upiId || getActiveUpiId())})</div>
         ${o.payment?.screenshot ? `
           <div class="order-ss-view">
             <span style="font-size:11px; text-transform:uppercase; color:var(--gold-dark); font-weight:600;">Payment Screenshot:</span>
@@ -921,7 +931,7 @@ function renderAdminOrders() {
 }
 
 /* ============================================================
-   SETTINGS (Persistent Password Change)
+   SETTINGS (Persistent Password & UPI ID Change)
    ============================================================ */
 
 function renderAdminSettings() {
@@ -934,7 +944,7 @@ function renderAdminSettings() {
       <label class="field"><span class="field-label">Store Email Address *</span><input name="email" type="email" value="${escapeHtml(c.email)}" required /></label>
       <label class="field"><span class="field-label">YouTube Channel Link</span><input name="youtube" value="${escapeHtml(c.youtube || "")}" placeholder="https://www.youtube.com/@DkCraze19" /></label>
       <label class="field"><span class="field-label">Instagram Profile URL</span><input name="instagram" value="${escapeHtml(c.instagram || "")}" /></label>
-      <label class="field"><span class="field-label">UPI ID for Direct Payments *</span><input name="upiId" value="${escapeHtml(c.upiId || "")}" required placeholder="919843441110@upi" /></label>
+      <label class="field"><span class="field-label">UPI ID for Direct Payments &amp; QR Scanner *</span><input name="upiId" value="${escapeHtml(c.upiId || "")}" required placeholder="e.g. hemabharathik@oksbi" /></label>
       <label class="field span-2"><span class="field-label">Admin Security Password *</span><input name="adminPassword" type="password" value="${escapeHtml(c.adminPassword)}" required /></label>
       <label class="field span-2"><span class="field-label">Wholesale Information Note</span><textarea name="wholesaleNote" rows="2">${escapeHtml(c.wholesaleNote || "")}</textarea></label>
       <div class="settings-actions">
@@ -948,6 +958,7 @@ function renderAdminSettings() {
     e.preventDefault();
     const fd = new FormData(e.target);
     const newPassword = fd.get("adminPassword").trim();
+    const newUpiId = fd.get("upiId").trim();
 
     if (!newPassword) {
       alert("Password cannot be empty.");
@@ -963,8 +974,8 @@ function renderAdminSettings() {
       youtube: fd.get("youtube").trim(),
       instagram: fd.get("instagram").trim(),
       wholesaleNote: fd.get("wholesaleNote").trim(),
-      upiId: fd.get("upiId").trim() || DEFAULT_CONFIG.upiId,
-      adminPassword: newPassword, // Explicitly saved
+      upiId: newUpiId || DEFAULT_CONFIG.upiId,
+      adminPassword: newPassword,
     };
 
     saveConfig();
