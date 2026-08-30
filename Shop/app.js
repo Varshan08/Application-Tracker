@@ -1,12 +1,8 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+/* ============================================================
+   FIREBASE CLOUD DATABASE CONFIGURATION
+   ============================================================ */
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyAiJ1h6dbpCPd_-IFZWugCqb6RVZC6kCDg",
   authDomain: "dk-store-a10f4.firebaseapp.com",
   projectId: "dk-store-a10f4",
@@ -16,42 +12,24 @@ const firebaseConfig = {
   measurementId: "G-HPKGRRPTT3"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-/* ============================================================
-   FIREBASE CLOUD DATABASE CONFIGURATION
-   Get these credentials from Firebase Console -> Project Settings -> General -> Web Apps
-   ============================================================ */
-
-const FIREBASE_CONFIG = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-
 let db = null;
 let isCloudActive = false;
 
-// Initialize Firebase if valid config is present
 try {
-  if (typeof firebase !== "undefined" && FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY") {
+  if (typeof firebase !== "undefined" && FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY") {
     firebase.initializeApp(FIREBASE_CONFIG);
     db = firebase.firestore();
     isCloudActive = true;
     console.log("☁️ Connected to Firebase Cloud Firestore");
   } else {
-    console.log("ℹ️ Running in Local Storage mode. Add Firebase config to sync across all devices.");
+    console.log("ℹ️ Running in Local Storage mode.");
   }
 } catch (err) {
   console.error("Firebase init failed, falling back to local storage:", err);
 }
 
 /* ============================================================
-   CONSTANTS & SAMPLE DATA
+   CONSTANTS & INITIAL DATA
    ============================================================ */
 
 const AUDIENCES = ["Kids", "Women"];
@@ -147,7 +125,7 @@ function priceDisplay(p) {
 }
 
 /* ============================================================
-   HYBRID STORAGE (Local Fallback + Cloud Firestore)
+   STORAGE
    ============================================================ */
 
 const DB = {
@@ -166,10 +144,13 @@ const DB = {
   },
 };
 
+const storedConfig = DB.get("storeConfig", null);
+const storedProducts = DB.get("products", null);
+
 const state = {
-  products: DB.get("products", null) || SEED_PRODUCTS,
+  products: storedProducts || SEED_PRODUCTS,
   orders: DB.get("orders", []),
-  config: DB.get("storeConfig", null) || DEFAULT_CONFIG,
+  config: storedConfig ? { ...DEFAULT_CONFIG, ...storedConfig } : DEFAULT_CONFIG,
   cart: [],
   audience: "All",
   typeFilter: "All",
@@ -205,11 +186,9 @@ function saveConfig() {
   }
 }
 
-// Real-Time Cloud Listeners: Pull changes instantly across all devices
 function syncWithCloud() {
   if (!isCloudActive) return;
 
-  // Listen to Products
   db.collection("settings").doc("inventory").onSnapshot((doc) => {
     if (doc.exists && doc.data().items) {
       state.products = doc.data().items;
@@ -217,22 +196,20 @@ function syncWithCloud() {
       renderProductGrid();
       if (state.isAdmin && state.adminTab === "products") renderAdminProducts();
     } else {
-      saveProducts(); // Seed initial inventory to cloud
+      saveProducts();
     }
   });
 
-  // Listen to Settings
   db.collection("settings").doc("storeConfig").onSnapshot((doc) => {
     if (doc.exists) {
       state.config = { ...DEFAULT_CONFIG, ...doc.data() };
       DB.set("storeConfig", state.config);
       renderChrome();
     } else {
-      saveConfig(); // Seed initial config to cloud
+      saveConfig();
     }
   });
 
-  // Listen to Orders
   db.collection("settings").doc("ordersLog").onSnapshot((doc) => {
     if (doc.exists && doc.data().list) {
       state.orders = doc.data().list;
@@ -243,7 +220,7 @@ function syncWithCloud() {
 }
 
 /* ============================================================
-   DOM SHORTCUTS & SVGS
+   DOM & SVGS
    ============================================================ */
 
 const $ = (id) => document.getElementById(id);
@@ -458,7 +435,7 @@ function openCart() { $("cartOverlay").classList.add("open"); }
 function closeCart() { $("cartOverlay").classList.remove("open"); }
 
 /* ============================================================
-   CHECKOUT FLOW
+   CHECKOUT
    ============================================================ */
 
 function getActiveUpiId() {
@@ -1215,3 +1192,9 @@ document.addEventListener("keydown", (e) => {
 /* ============================================================
    INITIALIZATION
    ============================================================ */
+
+renderChrome();
+renderProductGrid();
+renderCartBadge();
+icons();
+syncWithCloud();
