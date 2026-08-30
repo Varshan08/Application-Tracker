@@ -1,0 +1,37 @@
+type Product @table {
+  name: String!
+  brand: String!
+  audience: String!
+  category: String!
+  subcategory: String!
+  price: Float!
+  originalPrice: Float
+  stock: Int!
+  image: String
+  description: String
+  featured: Boolean @default(value: false)
+  wholesaleAvailable: Boolean @default(value: false)
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Order @table {
+  date: Timestamp! @default(expr: "request.time")
+  customerName: String!
+  customerPhone: String!
+  customerAddress: String!
+  notes: String
+  total: Float!
+  paymentMethod: String
+  targetUpiId: String
+  upiRef: String
+  screenshotUrl: String
+  status: String! @default(value: "PENDING")
+}
+
+type OrderItem @table {
+  order: Order!
+  product: Product!
+  name: String!
+  price: Float!
+  quantity: Int!
+}

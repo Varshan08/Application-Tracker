@@ -1,3 +1,55 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAiJ1h6dbpCPd_-IFZWugCqb6RVZC6kCDg",
+  authDomain: "dk-store-a10f4.firebaseapp.com",
+  projectId: "dk-store-a10f4",
+  storageBucket: "dk-store-a10f4.firebasestorage.app",
+  messagingSenderId: "988073277280",
+  appId: "1:988073277280:web:81ab753ad681a155b15005",
+  measurementId: "G-HPKGRRPTT3"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+/* ============================================================
+   FIREBASE CLOUD DATABASE CONFIGURATION
+   Get these credentials from Firebase Console -> Project Settings -> General -> Web Apps
+   ============================================================ */
+
+const FIREBASE_CONFIG = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+let db = null;
+let isCloudActive = false;
+
+// Initialize Firebase if valid config is present
+try {
+  if (typeof firebase !== "undefined" && FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY") {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    isCloudActive = true;
+    console.log("☁️ Connected to Firebase Cloud Firestore");
+  } else {
+    console.log("ℹ️ Running in Local Storage mode. Add Firebase config to sync across all devices.");
+  }
+} catch (err) {
+  console.error("Firebase init failed, falling back to local storage:", err);
+}
+
 /* ============================================================
    CONSTANTS & SAMPLE DATA
    ============================================================ */
@@ -14,7 +66,7 @@ const DEFAULT_CONFIG = {
   instagram: "https://www.instagram.com/reel/DclSrc6pNV8/?igsi=b2R5bzltcXZ0b2M4",
   youtube: "https://www.youtube.com/@DkCraze19",
   wholesaleNote: "Wholesale available — message us on WhatsApp for bulk pricing.",
-  upiId: "hemabharathik@oksbi", // Updated to your Official Google Pay UPI ID
+  upiId: "hemabharathik@oksbi",
   adminPassword: "admin123",
 };
 
@@ -95,7 +147,7 @@ function priceDisplay(p) {
 }
 
 /* ============================================================
-   STORAGE
+   HYBRID STORAGE (Local Fallback + Cloud Firestore)
    ============================================================ */
 
 const DB = {
@@ -104,30 +156,20 @@ const DB = {
       const raw = localStorage.getItem("dkcraze__" + key);
       return raw ? JSON.parse(raw) : fallback;
     } catch (e) {
-      console.error("Storage read failed", e);
       return fallback;
     }
   },
   set(key, value) {
     try {
       localStorage.setItem("dkcraze__" + key, JSON.stringify(value));
-    } catch (e) {
-      console.error("Storage write failed", e);
-    }
+    } catch (e) {}
   },
 };
 
-/* ============================================================
-   STATE
-   ============================================================ */
-
-const storedConfig = DB.get("storeConfig", null);
-const storedProducts = DB.get("products", null);
-
 const state = {
-  products: storedProducts || SEED_PRODUCTS,
+  products: DB.get("products", null) || SEED_PRODUCTS,
   orders: DB.get("orders", []),
-  config: storedConfig ? { ...DEFAULT_CONFIG, ...storedConfig } : DEFAULT_CONFIG,
+  config: DB.get("storeConfig", null) || DEFAULT_CONFIG,
   cart: [],
   audience: "All",
   typeFilter: "All",
@@ -142,23 +184,70 @@ const state = {
   adminUploadedProductImage: null,
 };
 
-if (!storedProducts) DB.set("products", state.products);
-if (!storedConfig) DB.set("storeConfig", state.config);
+function saveProducts() {
+  DB.set("products", state.products);
+  if (isCloudActive) {
+    db.collection("settings").doc("inventory").set({ items: state.products }).catch(console.error);
+  }
+}
 
-function saveProducts() { DB.set("products", state.products); }
-function saveOrders() { DB.set("orders", state.orders); }
-function saveConfig() { DB.set("storeConfig", state.config); }
+function saveOrders() {
+  DB.set("orders", state.orders);
+  if (isCloudActive) {
+    db.collection("settings").doc("ordersLog").set({ list: state.orders }).catch(console.error);
+  }
+}
+
+function saveConfig() {
+  DB.set("storeConfig", state.config);
+  if (isCloudActive) {
+    db.collection("settings").doc("storeConfig").set(state.config).catch(console.error);
+  }
+}
+
+// Real-Time Cloud Listeners: Pull changes instantly across all devices
+function syncWithCloud() {
+  if (!isCloudActive) return;
+
+  // Listen to Products
+  db.collection("settings").doc("inventory").onSnapshot((doc) => {
+    if (doc.exists && doc.data().items) {
+      state.products = doc.data().items;
+      DB.set("products", state.products);
+      renderProductGrid();
+      if (state.isAdmin && state.adminTab === "products") renderAdminProducts();
+    } else {
+      saveProducts(); // Seed initial inventory to cloud
+    }
+  });
+
+  // Listen to Settings
+  db.collection("settings").doc("storeConfig").onSnapshot((doc) => {
+    if (doc.exists) {
+      state.config = { ...DEFAULT_CONFIG, ...doc.data() };
+      DB.set("storeConfig", state.config);
+      renderChrome();
+    } else {
+      saveConfig(); // Seed initial config to cloud
+    }
+  });
+
+  // Listen to Orders
+  db.collection("settings").doc("ordersLog").onSnapshot((doc) => {
+    if (doc.exists && doc.data().list) {
+      state.orders = doc.data().list;
+      DB.set("orders", state.orders);
+      if (state.isAdmin && state.adminTab === "orders") renderAdminOrders();
+    }
+  });
+}
 
 /* ============================================================
-   DOM SHORTCUTS
+   DOM SHORTCUTS & SVGS
    ============================================================ */
 
 const $ = (id) => document.getElementById(id);
 function icons() { if (window.lucide) lucide.createIcons(); }
-
-/* ============================================================
-   NAVBAR & CHROME
-   ============================================================ */
 
 const SVG_ICONS = {
   youtube: `<svg class="brand-svg-icon yt" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`,
@@ -197,7 +286,7 @@ function renderChrome() {
 }
 
 /* ============================================================
-   PRODUCT GRID
+   PRODUCT GRID & DETAILS
    ============================================================ */
 
 function getFilteredProducts() {
@@ -254,10 +343,6 @@ function renderProductGrid() {
   icons();
 }
 
-/* ============================================================
-   PRODUCT MODAL
-   ============================================================ */
-
 function openProductModal(id) {
   const p = state.products.find((x) => x.id === id);
   if (!p) return;
@@ -293,7 +378,7 @@ function closeProductModal() {
 }
 
 /* ============================================================
-   CART
+   CART DRAWER
    ============================================================ */
 
 function addToCart(productId) {
@@ -373,7 +458,7 @@ function openCart() { $("cartOverlay").classList.add("open"); }
 function closeCart() { $("cartOverlay").classList.remove("open"); }
 
 /* ============================================================
-   CHECKOUT (Dynamic QR Scanner Bound to Admin UPI ID)
+   CHECKOUT FLOW
    ============================================================ */
 
 function getActiveUpiId() {
@@ -403,7 +488,7 @@ function buildOrderMessage(order) {
     `*Total Paid:* ${fmt(order.total)} via GPay / UPI`,
     `*Payment Sent To UPI ID:* ${getActiveUpiId()}`,
     `*UPI Ref ID:* ${order.payment.upiRef || "Not provided"}`,
-    `*Payment Screenshot:* ${order.payment.screenshot ? "Attached / Stored" : "Not attached"}`,
+    `*Payment Screenshot:* ${order.payment.screenshot ? "Attached / Saved in Cloud" : "Not attached"}`,
     "",
     `*Customer Details:*`,
     `Name: ${order.customer.name}`,
@@ -590,7 +675,7 @@ function showOrderSuccess(order) {
 function closeCheckout() { $("checkoutOverlay").classList.add("hidden"); }
 
 /* ============================================================
-   ADMIN VIEWS & LOGIC (Strict Authentication)
+   ADMIN CONTROLS & VIEWS
    ============================================================ */
 
 function openAdminLogin() {
@@ -647,10 +732,6 @@ function renderAdminContent() {
   else if (state.adminTab === "orders") renderAdminOrders();
   else renderAdminSettings();
 }
-
-/* ============================================================
-   PRODUCT FORM (Dedicated Price & Quantity Inputs)
-   ============================================================ */
 
 function productFormHtml(product) {
   const f = product || {
@@ -807,10 +888,6 @@ function renderAdminProducts() {
   }
 }
 
-/* ============================================================
-   ORDER LOGS
-   ============================================================ */
-
 function exportOrdersToCSV() {
   if (state.orders.length === 0) {
     alert("No orders available to export.");
@@ -929,10 +1006,6 @@ function renderAdminOrders() {
     });
   }
 }
-
-/* ============================================================
-   SETTINGS (Persistent Password & UPI ID Change)
-   ============================================================ */
 
 function renderAdminSettings() {
   const c = state.config;
@@ -1139,7 +1212,6 @@ document.addEventListener("keydown", (e) => {
   overlay.insertBefore(scrim, overlay.firstChild);
 })();
 
-renderChrome();
-renderProductGrid();
-renderCartBadge();
-icons();
+/* ============================================================
+   INITIALIZATION
+   ============================================================ */

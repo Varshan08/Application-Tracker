@@ -1,0 +1,105 @@
+mutation CreateOrderData @transaction @auth(level: USER) {
+  order_insert(data: {
+    customerName: "John Doe",
+    customerPhone: "1234567890",
+    customerAddress: "123 Main St",
+    total: 99.99,
+    status: "PENDING"
+  })
+}
+
+mutation UpdateOrderStatus($id: UUID!, $status: String!) @auth(level: USER) {
+  order_update(id: $id, data: { status: $status })
+}
+
+mutation DeleteOrder($id: UUID!) @auth(level: USER) {
+  order_delete(id: $id)
+}
+
+query GetOrder($id: UUID!) @auth(level: USER) {
+  order(id: $id) {
+    id
+    customerName
+    total
+    status
+  }
+}
+
+query ListOrders @auth(level: USER) {
+  orders(limit: 50) {
+    id
+    customerName
+    total
+    status
+  }
+}
+
+mutation CreateProductData @transaction @auth(level: PUBLIC, insecureReason: "Public product catalog access.") {
+  product_insert(data: {
+    name: "Smartphone",
+    brand: "TechCo",
+    audience: "Adults",
+    category: "Electronics",
+    subcategory: "Mobile",
+    price: 599.99,
+    stock: 50
+  })
+}
+
+mutation UpdateProductStock($id: UUID!, $stock: Int!) @auth(level: PUBLIC, insecureReason: "Public inventory updates.") {
+  product_update(id: $id, data: { stock: $stock })
+}
+
+mutation DeleteProduct($id: UUID!) @auth(level: PUBLIC, insecureReason: "Public catalog maintenance.") {
+  product_delete(id: $id)
+}
+
+query GetProduct($id: UUID!) @auth(level: PUBLIC, insecureReason: "Public product lookup.") {
+  product(id: $id) {
+    name
+    price
+    stock
+  }
+}
+
+query ListProducts @auth(level: PUBLIC, insecureReason: "Public product catalog browsing.") {
+  products(limit: 50) {
+    name
+    brand
+    price
+  }
+}
+
+mutation CreateOrderItemData @transaction @auth(level: USER) {
+  orderItem_insert(data: {
+    name: "Smartphone",
+    price: 599.99,
+    quantity: 1,
+    order: { id: "00000000-0000-0000-0000-000000000000" },
+    product: { id: "00000000-0000-0000-0000-000000000000" }
+  })
+}
+
+mutation UpdateOrderItemQuantity($id: UUID!, $quantity: Int!) @auth(level: USER) {
+  orderItem_update(id: $id, data: { quantity: $quantity })
+}
+
+mutation DeleteOrderItem($id: UUID!) @auth(level: USER) {
+  orderItem_delete(id: $id)
+}
+
+query GetOrderItem($id: UUID!) @auth(level: USER) {
+  orderItem(id: $id) {
+    name
+    price
+    quantity
+  }
+}
+
+query ListOrderItems @auth(level: USER) {
+  orderItems(limit: 50) {
+    name
+    price
+    quantity
+  }
+}

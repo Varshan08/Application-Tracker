@@ -1,0 +1,75 @@
+mutation SeedData @transaction @auth(level: USER) {
+  product_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440001",
+      name: "Wireless Mouse",
+      brand: "Logitech",
+      audience: "Office",
+      category: "Electronics",
+      subcategory: "Peripherals",
+      price: 29.99,
+      stock: 100
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440002",
+      name: "Mechanical Keyboard",
+      brand: "Keychron",
+      audience: "Gaming",
+      category: "Electronics",
+      subcategory: "Peripherals",
+      price: 89.99,
+      stock: 50
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440003",
+      name: "Ergonomic Chair",
+      brand: "HermanMiller",
+      audience: "Workplace",
+      category: "Furniture",
+      subcategory: "Seating",
+      price: 499.99,
+      stock: 20
+    }
+  ])
+  order_insertMany(data: [
+    {
+      id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01",
+      customerName: "Alice Smith",
+      customerPhone: "555-0101",
+      customerAddress: "123 Maple St, Springfield",
+      total: 119.98,
+      status: "COMPLETED"
+    },
+    {
+      id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a02",
+      customerName: "Bob Jones",
+      customerPhone: "555-0202",
+      customerAddress: "456 Oak Ave, Metropolis",
+      total: 499.99,
+      status: "PENDING"
+    }
+  ])
+  orderItem_insertMany(data: [
+    {
+      orderId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01",
+      productId: "550e8400-e29b-41d4-a716-446655440001",
+      name: "Wireless Mouse",
+      price: 29.99,
+      quantity: 1
+    },
+    {
+      orderId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01",
+      productId: "550e8400-e29b-41d4-a716-446655440002",
+      name: "Mechanical Keyboard",
+      price: 89.99,
+      quantity: 1
+    },
+    {
+      orderId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a02",
+      productId: "550e8400-e29b-41d4-a716-446655440003",
+      name: "Ergonomic Chair",
+      price: 499.99,
+      quantity: 1
+    }
+  ])
+}
