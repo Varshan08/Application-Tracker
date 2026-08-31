@@ -32,7 +32,7 @@ try {
    CONSTANTS & INITIAL DATA
    ============================================================ */
 
-const AUDIENCES = ["Kids", "Women"];
+const AUDIENCES = ["Kids", "Women", "Both"];
 const CATEGORIES = ["Clothing", "Jewelry"];
 
 const DEFAULT_CONFIG = {
@@ -152,7 +152,7 @@ const state = {
   orders: DB.get("orders", []),
   config: storedConfig ? { ...DEFAULT_CONFIG, ...storedConfig } : DEFAULT_CONFIG,
   cart: [],
-  audience: "All",
+  audience: "All", // All | Kids | Women | Both
   typeFilter: "All",
   search: "",
   orderFilterSearch: "",
@@ -193,6 +193,7 @@ function syncWithCloud() {
     if (doc.exists && doc.data().items) {
       state.products = doc.data().items;
       DB.set("products", state.products);
+      renderHeroImages();
       renderProductGrid();
       if (state.isAdmin && state.adminTab === "products") renderAdminProducts();
     } else {
@@ -232,6 +233,17 @@ const SVG_ICONS = {
   mail: `<svg class="brand-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`
 };
 
+function renderHeroImages() {
+  const sorted = [...state.products].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const img1 = sorted[0]?.image || "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?auto=format&fit=crop&w=700&q=80";
+  const img2 = sorted[1]?.image || sorted[0]?.image || "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=700&q=80";
+
+  $("heroImagesContainer").innerHTML = `
+    <img class="hero-img offset" src="${escapeHtml(img1)}" alt="Latest addition 1" onerror="this.src='https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?auto=format&fit=crop&w=700&q=80';" />
+    <img class="hero-img" src="${escapeHtml(img2)}" alt="Latest addition 2" onerror="this.src='https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=700&q=80';" />
+  `;
+}
+
 function renderChrome() {
   const c = state.config;
   $("navStoreName").textContent = c.storeName;
@@ -259,6 +271,7 @@ function renderChrome() {
   $("navMobileLinks").innerHTML = audienceLinksHtml;
 
   $("typeFilterSelect").value = state.typeFilter;
+  renderHeroImages();
   icons();
 }
 
@@ -268,7 +281,12 @@ function renderChrome() {
 
 function getFilteredProducts() {
   let list = [...state.products];
-  if (state.audience !== "All") list = list.filter((p) => p.audience === state.audience);
+  if (state.audience !== "All") {
+    list = list.filter((p) => {
+      if (p.audience === "Both") return true;
+      return p.audience === state.audience;
+    });
+  }
   if (state.typeFilter !== "All") list = list.filter((p) => p.category === state.typeFilter);
   if (state.search.trim()) {
     const q = state.search.toLowerCase();
@@ -860,6 +878,7 @@ function renderAdminProducts() {
       state.editingProductId = null;
       state.addingProduct = false;
       state.adminUploadedProductImage = null;
+      renderHeroImages();
       renderAdminProducts();
     });
   }
@@ -1093,6 +1112,7 @@ document.addEventListener("click", (e) => {
     case "delete-product":
       state.products = state.products.filter((p) => p.id !== id);
       saveProducts();
+      renderHeroImages();
       renderAdminProducts();
       break;
     case "export-orders":
